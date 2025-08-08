@@ -99,8 +99,17 @@ export default function PricingPage() {
 
   const handlePlanSelect = (planId: string) => {
     setSelectedPlan(planId);
-    // Here you would integrate with Stripe or your payment processor
-    console.log(`Selected plan: ${planId}`);
+    
+    if (planId === 'free') {
+      // Redirect to free scan
+      window.location.href = '/scan';
+    } else if (planId === 'masterclass' || planId === 'enterprise') {
+      // Redirect to payment page
+      window.location.href = '/payment';
+    } else {
+      // For professional plan, could implement subscription flow
+      console.log(`Selected plan: ${planId}`);
+    }
   };
 
   return (

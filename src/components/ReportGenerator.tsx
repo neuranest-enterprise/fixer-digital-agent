@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { ScanResult, aiScanner } from '../lib/ai-scanner';
+import { pdfGenerator, ReportData } from '../lib/pdf-generator';
+import { StripePaymentProcessor } from '../lib/stripe-client';
 
 /**
  * 💎 WORLD-CLASS REPORT GENERATOR
@@ -20,11 +22,45 @@ export default function ReportGenerator({ scanResult, websiteUrl }: ReportGenera
   const generatePDFReport = async () => {
     setIsGenerating(true);
     
-    // Simulate advanced report generation
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    try {
+      // Prepare report data
+      const reportData: ReportData = {
+        websiteUrl,
+        overallScore: scanResult.score,
+        technicalScore: scanResult.performanceMetrics.lighthouseScore,
+        performanceScore: scanResult.performanceMetrics.mobileScore,
+        seoScore: Math.round(scanResult.score * 0.9), // Derived from overall score
+        uxScore: scanResult.visualData.designScore,
+        insights: scanResult.insights.map(i => i.description),
+        recommendations: scanResult.insights.map(i => i.solution),
+        competitorAnalysis: scanResult.competitorAnalysis.strengthsWeaknesses,
+        revenueProjections: {
+          current: scanResult.revenueProjections.currentRevenue,
+          projected: scanResult.revenueProjections.projectedRevenue,
+          multiplier: scanResult.revenueProjections.multipleIncrease
+        },
+        generatedDate: new Date()
+      };
+
+      // Generate PDF using our world-class generator
+      const pdfBlob = await pdfGenerator.generateExecutiveSummary(reportData);
+      
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${websiteUrl.replace(/[^a-z0-9]/gi, '_')}_quantum_analysis_report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setReportGenerated(true);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
     
     setIsGenerating(false);
-    setReportGenerated(true);
   };
 
   const generateVideoReport = async () => {
