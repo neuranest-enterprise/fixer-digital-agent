@@ -35,13 +35,13 @@ export default function Home() {
       <main className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-            Generate <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-red-500">5000% ROI</span>
-            <span className="block text-blue-200">With AI Precision</span>
+            Generate <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-red-500">Multifold ROI</span>
+            <span className="block text-blue-200">With Quantum Intelligence</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            <span className="font-bold text-yellow-300">Academic-Level AI Research</span> meets enterprise optimization. 
-            Our PhD-developed algorithms deliver <span className="font-bold">guaranteed 10x-50x returns</span> in 30 days.
+            <span className="font-bold text-yellow-300">Revolutionary Quantum Deep Scan</span> meets enterprise transformation. 
+            Our AI Co-Pilot delivers <span className="font-bold">guaranteed business multiplication</span> in 30 days.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -49,7 +49,7 @@ export default function Home() {
               href="/scan"
               className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition-colors inline-flex items-center justify-center"
             >
-              🚀 Get Free Website Scan
+              🔬 Start Quantum Deep Scan
             </Link>
             <Link 
               href="/pricing"
@@ -95,13 +95,13 @@ export default function Home() {
             🏆 WORLD-CLASS ACADEMIC RESEARCH
           </h2>
           <p className="text-xl text-purple-100 mb-12 max-w-4xl mx-auto">
-            Built by PhD researchers from MIT, Stanford, and Cambridge. Our algorithms are published in Nature, Science, and top-tier AI conferences.
+            <span className="font-bold text-cyan-300">Quantum Deep Scan & Diagnostics</span> • <span className="font-bold text-green-300">Competitive Landscape Analysis</span> • <span className="font-bold text-yellow-300">Viral Content Blueprint</span> • <span className="font-bold text-pink-300">90-Day Growth Roadmap</span> • <span className="font-bold text-red-300">$5,000 Executive Summary</span>
           </p>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 p-8 rounded-2xl border border-yellow-400/30">
-              <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-500 mb-2">5000%</div>
-              <div className="text-yellow-100 font-semibold">Guaranteed ROI</div>
-              <div className="text-xs text-yellow-200/70 mt-1">Or full refund + $10K</div>
+              <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-500 mb-2">Multifold</div>
+              <div className="text-yellow-100 font-semibold">ROI Multiplication</div>
+              <div className="text-xs text-yellow-200/70 mt-1">Business transformation</div>
             </div>
             <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 p-8 rounded-2xl border border-green-400/30">
               <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-500 mb-2">$2.5M</div>
