@@ -188,7 +188,7 @@ export class MultiAIProcessor {
       const result = await this.geminiModel.generateContent(prompt);
       const response = await result.response;
       
-      const insights = response.text().split('\n').filter(line => line.trim().length > 0);
+      const insights = response.text().split('\n').filter((line: string) => line.trim().length > 0);
       return insights.slice(0, 10);
     } catch (error) {
       console.error('Competitive analysis error:', error);

@@ -197,12 +197,12 @@ export default function PricingPage() {
                   {typeof plan.price.monthly === 'number' ? (
                     <>
                       <div className="text-4xl font-bold text-white">
-                        ${billingCycle === 'monthly' ? plan.price.monthly : Math.floor(plan.price.annual / 12)}
+                        ${billingCycle === 'monthly' ? plan.price.monthly : typeof plan.price.annual === 'number' ? Math.floor(plan.price.annual / 12) : 'Custom'}
                       </div>
                       <div className="text-gray-400 text-sm">
                         {billingCycle === 'monthly' ? 'per month' : 'per month (billed annually)'}
                       </div>
-                      {billingCycle === 'annual' && plan.price.monthly > 0 && (
+                      {billingCycle === 'annual' && typeof plan.price.monthly === 'number' && plan.price.monthly > 0 && typeof plan.price.annual === 'number' && (
                         <div className="text-green-400 text-sm">
                           Save ${(plan.price.monthly * 12 - plan.price.annual).toLocaleString()}/year
                         </div>
