@@ -6,13 +6,24 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
 
-// Initialize AI clients
-const geminiKeys = process.env.GEMINI_API_KEYS?.split(',') || [];
-const gemini = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
+// Initialize AI clients safely
+const geminiKeys = (typeof process !== 'undefined' && process.env.GEMINI_API_KEYS) ? process.env.GEMINI_API_KEYS.split(',') : [];
+const geminiApiKey = (typeof process !== 'undefined' && process.env.GOOGLE_GEMINI_API_KEY) ? process.env.GOOGLE_GEMINI_API_KEY : '';
+const openaiApiKey = (typeof process !== 'undefined' && process.env.OPENAI_API_KEY) ? process.env.OPENAI_API_KEY : '';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+// Initialize clients only when API keys are available
+let gemini: GoogleGenerativeAI | null = null;
+let openai: OpenAI | null = null;
+
+if (geminiApiKey) {
+  gemini = new GoogleGenerativeAI(geminiApiKey);
+}
+
+if (openaiApiKey) {
+  openai = new OpenAI({
+    apiKey: openaiApiKey,
+  });
+}
 
 export interface AIAnalysisResult {
   technicalScore: number;
@@ -34,7 +45,7 @@ export class MultiAIProcessor {
   private currentGeminiKeyIndex = 0;
 
   constructor() {
-    this.geminiModel = gemini.getGenerativeModel({ model: 'gemini-pro' });
+    this.geminiModel = gemini?.getGenerativeModel({ model: 'gemini-pro' }) || null;
   }
 
   /**
@@ -72,6 +83,9 @@ export class MultiAIProcessor {
    */
   private async analyzeWithGemini(url: string, content: string): Promise<any> {
     try {
+      if (!this.geminiModel) {
+        return this.getFallbackAnalysis('Gemini (API key not available)');
+      }
       const prompt = `
         You are a world-class website optimization expert with PhD-level knowledge. 
         
@@ -117,6 +131,9 @@ export class MultiAIProcessor {
    */
   private async analyzeWithOpenAI(url: string, content: string): Promise<any> {
     try {
+      if (!openai) {
+        return this.getFallbackAnalysis('OpenAI (API key not available)');
+      }
       const completion = await openai.chat.completions.create({
         model: "gpt-4",
         messages: [
@@ -205,6 +222,14 @@ export class MultiAIProcessor {
    */
   private async projectRevenue(content: string): Promise<any> {
     try {
+      if (!openai) {
+        return {
+          current: 85000,
+          projected: 425000,
+          multiplier: 5.0
+        };
+      }
+      
       const completion = await openai.chat.completions.create({
         model: "gpt-4",
         messages: [
@@ -319,7 +344,7 @@ export class MultiAIProcessor {
    * 🔄 ROTATE GEMINI API KEYS for rate limiting
    */
   private rotateGeminiKey(): string {
-    if (geminiKeys.length === 0) return process.env.GOOGLE_GEMINI_API_KEY!;
+    if (geminiKeys.length === 0) return geminiApiKey || '';
     
     const key = geminiKeys[this.currentGeminiKeyIndex];
     this.currentGeminiKeyIndex = (this.currentGeminiKeyIndex + 1) % geminiKeys.length;

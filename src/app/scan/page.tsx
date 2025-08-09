@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ScanResult, aiScanner } from '../../lib/ai-scanner';
-import { multiAI, AIAnalysisResult } from '../../lib/ai-integrations';
+import { ScanResult } from '../../lib/ai-scanner';
 import { pdfGenerator, ReportData } from '../../lib/pdf-generator';
 import ReportGenerator from '../../components/ReportGenerator';
 
@@ -50,15 +49,22 @@ export default function ScanPage() {
     }
 
     try {
-      // Fetch website content for AI analysis
-      const websiteContent = await fetchWebsiteContent(url);
-      
-      // Perform multi-AI quantum analysis
-      const aiResult = await multiAI.performQuantumAnalysis(url, websiteContent);
-      
-      // Convert to ScanResult format
-      const result = convertAIResultToScanResult(aiResult, url);
-      setScanResult(result);
+      // Use server-side API for AI analysis
+      const response = await fetch('/api/scan', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ websiteUrl: url }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const result = convertAIResultToScanResult(data.analysis, url);
+        setScanResult(result);
+      } else {
+        throw new Error('Scan API failed');
+      }
     } catch (error) {
       console.error('Scan error:', error);
       // Provide demo result for showcase
@@ -172,7 +178,7 @@ export default function ScanPage() {
     }
   };
 
-  const convertAIResultToScanResult = (aiResult: AIAnalysisResult, url: string): ScanResult => {
+  const convertAIResultToScanResult = (aiResult: any, url: string): ScanResult => {
     const overallScore = Math.round((aiResult.technicalScore + aiResult.performanceScore + aiResult.seoScore + aiResult.uxScore) / 4);
     
     return {
