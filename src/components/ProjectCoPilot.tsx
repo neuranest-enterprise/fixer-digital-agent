@@ -23,11 +23,16 @@ interface Action {
 }
 
 export default function ProjectCoPilot() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'ai',
-      content: `🤖 **Welcome to your Project Co-Pilot!**
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    // Initialize messages on client side to avoid hydration mismatch
+    setMessages([
+      {
+        id: '1',
+        type: 'ai',
+        content: `🤖 **Welcome to your Project Co-Pilot!**
 
 I'm your advanced AI assistant for project and file management. I can help you:
 
@@ -38,23 +43,26 @@ I'm your advanced AI assistant for project and file management. I can help you:
 • **$5,000 Executive Summary** - C-suite level insights
 
 What would you like to work on today?`,
-      timestamp: new Date(),
-      actions: [
-        {
-          type: 'analyze_project',
-          title: '🔬 Start Quantum Analysis',
-          description: 'Deep dive into technical performance',
-          execute: () => handleQuantumAnalysis()
-        },
-        {
-          type: 'generate_report',
-          title: '💎 Create Executive Summary',
-          description: 'Generate $5,000 value report',
-          execute: () => handleExecutiveSummary()
-        }
-      ]
-    }
-  ]);
+        timestamp: new Date(),
+        actions: [
+          {
+            type: 'analyze_project',
+            title: '🔬 Start Quantum Analysis',
+            description: 'Deep dive into technical performance',
+            execute: () => handleQuantumAnalysis()
+          },
+          {
+            type: 'generate_report',
+            title: '💎 Create Executive Summary',
+            description: 'Generate $5,000 value report',
+            execute: () => handleExecutiveSummary()
+          }
+        ]
+      }
+    ]);
+    setIsInitialized(true);
+  }, []);
+
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -531,6 +539,11 @@ I can help you with:
 What's your primary goal? I'll create a customized action plan for maximum impact.`;
   };
 
+  // Don't render until initialized to prevent hydration mismatch
+  if (!isInitialized) {
+    return null;
+  }
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {/* Chat Toggle Button */}
@@ -578,7 +591,7 @@ What's your primary goal? I'll create a customized action plan for maximum impac
                   )}
                 </div>
                 <div className={`text-xs text-gray-400 mt-1 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
-                  {message.timestamp.toLocaleTimeString()}
+                  {isInitialized ? message.timestamp.toLocaleTimeString() : 'Just now'}
                 </div>
               </div>
             ))}
