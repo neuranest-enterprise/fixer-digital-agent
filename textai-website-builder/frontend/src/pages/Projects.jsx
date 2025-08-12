@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 function Projects() {
   const [projects, setProjects] = useState([]);
@@ -9,7 +9,7 @@ function Projects() {
     (async () => {
       try {
         setLoading(true);
-        const res = await axios.get('/api/projects');
+        const res = await api.get('/api/projects');
         setProjects(res.data || []);
       } finally {
         setLoading(false);

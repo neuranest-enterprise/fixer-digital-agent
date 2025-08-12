@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 function Builder() {
   const [prompt, setPrompt] = useState('Futuristic dashboard SaaS with gallery and hero');
@@ -11,7 +11,7 @@ function Builder() {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.post('/api/generate_page', { prompt });
+      const response = await api.post('/api/generate_page', { prompt });
       setGenerated(response.data.html || '');
     } catch (e) {
       setError('Generation failed. Is the backend running?');
