@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 
 let backendProc = null;
 
@@ -19,7 +20,7 @@ function startBackend() {
   const cwd = app.isPackaged ? process.resourcesPath : path.resolve(__dirname, '..');
   const args = ['-m', 'uvicorn', 'backend.app.main:app', '--host', '127.0.0.1', '--port', '8000'];
 
-  backendProc = spawn(python, args, { cwd, stdio: 'inherit' });
+  backendProc = spawn(python, args, { cwd, stdio: 'inherit', env: { ...process.env } });
 
   backendProc.on('exit', (code) => {
     backendProc = null;

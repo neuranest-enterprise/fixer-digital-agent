@@ -8,3 +8,4 @@ torch==2.1.0
 pinecone-client==2.2.4
 requests==2.31.0
 python-dotenv==1.0.0
+stripe==8.9.0

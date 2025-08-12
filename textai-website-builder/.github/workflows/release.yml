@@ -34,6 +34,10 @@ jobs:
       - name: Build and publish installers
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: if you need to run backend in CI or validate, make these secrets in repo settings
+          STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SIGNING_SECRET: ${{ secrets.STRIPE_WEBHOOK_SIGNING_SECRET }}
         run: |
           cd electron
           npx electron-builder --publish always

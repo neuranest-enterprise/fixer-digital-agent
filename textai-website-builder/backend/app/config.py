@@ -19,6 +19,15 @@ GEMINI_API_KEY = os.getenv("GOOGLE_GEMINI_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 
+# Stripe
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SIGNING_SECRET = os.getenv("STRIPE_WEBHOOK_SIGNING_SECRET")
+
+# URLs
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+APP_URL = os.getenv("APP_URL", "http://127.0.0.1:8000")
+
 # Storage
 STORAGE_DIR = os.path.join(BACKEND_DIR, "storage")
 PROJECTS_DIR = os.path.join(STORAGE_DIR, "projects")
