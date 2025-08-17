@@ -23,6 +23,9 @@ export default function Home() {
               <Link href="/pricing" className="text-white/80 hover:text-white transition-colors">
                 Pricing
               </Link>
+              <Link href="/calculator" className="text-white/80 hover:text-white transition-colors">
+                ROI Calculator
+              </Link>
               <Link href="/pricing" className="bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                 Get Started
               </Link>
