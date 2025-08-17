@@ -1,0 +1,42 @@
+{
+  "name": "ai-website-builder-electron",
+  "version": "1.0.0",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env FRONTEND_DEV_SERVER=http://localhost:3000 electron .",
+    "build:renderer": "cd ../frontend && npm install && npm run build",
+    "dist": "npm run build:renderer && electron-builder --publish always"
+  },
+  "dependencies": {
+    "electron": "28.3.3",
+    "dotenv": "16.4.5"
+  },
+  "devDependencies": {
+    "electron-builder": "24.13.3",
+    "cross-env": "7.0.3"
+  },
+  "build": {
+    "appId": "com.example.aiwebsitebuilder",
+    "productName": "AI Website Builder",
+    "asar": true,
+    "files": [
+      "main.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "../frontend/build",
+        "to": "frontend/build",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": { "target": ["dmg", "zip"] },
+    "win": { "target": ["nsis", "zip"] },
+    "linux": { "target": ["AppImage", "deb", "zip"] }
+  }
+}
