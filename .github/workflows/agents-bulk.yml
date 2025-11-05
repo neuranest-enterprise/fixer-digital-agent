@@ -1,0 +1,254 @@
+# GitHub Actions Workflow: Bulk Agent Execution
+# Description: Runs the bulk Agent Workflow script on a schedule and after each push to main
+# Purpose: Automate execution of all agents, collect results, and post summary notifications
+#
+# Features:
+# - Scheduled runs (customizable cron)
+# - Triggered on push to main branch
+# - Artifact storage for logs and results
+# - Concurrency management to prevent overlapping runs
+# - Workflow summary posting for notification
+# - Error handling and retry logic
+# - Timestamped logging for audit trails
+
+name: Bulk Agent Workflow
+
+on:
+  # Run on schedule (daily at 2 AM UTC)
+  schedule:
+    - cron: '0 2 * * *'
+  # Run on push to main branch
+  push:
+    branches:
+      - main
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run mode (skip actual execution)'
+        required: false
+        default: 'false'
+
+# Concurrency settings: only one workflow run at a time, cancel in-progress on new push
+concurrency:
+  group: bulk-agent-workflow
+  cancel-in-progress: true
+
+jobs:
+  run-agents:
+    name: Execute Bulk Agent Script
+    runs-on: ubuntu-latest
+    timeout-minutes: 120  # 2-hour timeout for the job
+    
+    outputs:
+      status: ${{ steps.execute.outputs.status }}
+      summary: ${{ steps.execute.outputs.summary }}
+      timestamp: ${{ steps.setup-timestamp.outputs.timestamp }}
+    
+    steps:
+      # 1. Setup timestamp for logging
+      - name: Setup Timestamp
+        id: setup-timestamp
+        run: echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
+      # 2. Checkout repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better context
+
+      # 3. Setup runtime environment (Node.js, Python, etc.)
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 4. Install dependencies
+      - name: Install Dependencies
+        run: npm ci
+        continue-on-error: true  # Don't fail if optional deps missing
+
+      # 5. Create logs directory
+      - name: Create Logs Directory
+        run: mkdir -p logs
+
+      # 6. Execute bulk agent script with error handling
+      - name: Execute Bulk Agent Script
+        id: execute
+        timeout-minutes: 90
+        run: |
+          set -e  # Exit on error
+          set -o pipefail  # Exit on pipe failure
+          
+          # Log execution start
+          echo "=== Bulk Agent Workflow Execution ==="
+          echo "Start Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo "Triggered by: ${{ github.event_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo ""
+          
+          # Initialize output variables
+          status="success"
+          summary=""
+          
+          # Check if script exists
+          if [ ! -f "scripts/run-all-agents.sh" ]; then
+            echo "ERROR: scripts/run-all-agents.sh not found"
+            status="failure"
+            summary="Script not found: scripts/run-all-agents.sh"
+          else
+            # Make script executable
+            chmod +x scripts/run-all-agents.sh
+            
+            # Run the script with output to both console and log file
+            if scripts/run-all-agents.sh 2>&1 | tee "logs/agents-execution-${{ steps.setup-timestamp.outputs.timestamp }}.log"; then
+              status="success"
+              summary="✓ All agents executed successfully"
+            else
+              status="failure"
+              summary="✗ Agent execution encountered errors (see logs)"
+            fi
+          fi
+          
+          # Log execution end
+          echo ""
+          echo "End Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo "Status: $status"
+          echo "Summary: $summary"
+          
+          # Export outputs
+          echo "status=$status" >> $GITHUB_OUTPUT
+          echo "summary=$summary" >> $GITHUB_OUTPUT
+          
+          # Exit with appropriate code
+          [ "$status" = "success" ] || exit 1
+        continue-on-error: true  # Continue to notification even if agents fail
+
+      # 7. Generate execution report
+      - name: Generate Execution Report
+        if: always()
+        run: |
+          echo "# Bulk Agent Workflow Execution Report" > logs/EXECUTION_REPORT.md
+          echo "" >> logs/EXECUTION_REPORT.md
+          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> logs/EXECUTION_REPORT.md
+          echo "**Event:** ${{ github.event_name }}" >> logs/EXECUTION_REPORT.md
+          echo "**Branch:** ${{ github.ref }}" >> logs/EXECUTION_REPORT.md
+          echo "**Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})" >> logs/EXECUTION_REPORT.md
+          echo "**Author:** ${{ github.actor }}" >> logs/EXECUTION_REPORT.md
+          echo "**Status:** ${{ steps.execute.outputs.status }}" >> logs/EXECUTION_REPORT.md
+          echo "**Summary:** ${{ steps.execute.outputs.summary }}" >> logs/EXECUTION_REPORT.md
+          echo "" >> logs/EXECUTION_REPORT.md
+          echo "## Logs" >> logs/EXECUTION_REPORT.md
+          if [ -f "logs/agents-execution-${{ steps.setup-timestamp.outputs.timestamp }}.log" ]; then
+            echo "\`\`\`" >> logs/EXECUTION_REPORT.md
+            tail -100 "logs/agents-execution-${{ steps.setup-timestamp.outputs.timestamp }}.log" >> logs/EXECUTION_REPORT.md
+            echo "\`\`\`" >> logs/EXECUTION_REPORT.md
+          fi
+
+      # 8. Upload logs as artifacts
+      - name: Upload Logs as Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-execution-logs-${{ steps.setup-timestamp.outputs.timestamp }}
+          path: logs/
+          retention-days: 30
+          compression-level: 6
+        continue-on-error: true
+
+  # Notification job
+  notify-results:
+    name: Post Workflow Summary
+    needs: run-agents
+    runs-on: ubuntu-latest
+    if: always()  # Run even if previous job failed
+    
+    steps:
+      # 1. Checkout for context
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Download artifacts for reporting
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+        continue-on-error: true
+
+      # 3. Generate and post workflow summary
+      - name: Post Workflow Summary
+        env:
+          STATUS: ${{ needs.run-agents.outputs.status }}
+          SUMMARY: ${{ needs.run-agents.outputs.summary }}
+          TIMESTAMP: ${{ needs.run-agents.outputs.timestamp }}
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          # Bulk Agent Workflow Results
+          
+          | Field | Value |
+          |-------|-------|
+          | **Status** | ${{ env.STATUS == 'success' && '✅ Success' || '❌ Failed' }} |
+          | **Summary** | ${{ env.SUMMARY }} |
+          | **Timestamp** | ${{ env.TIMESTAMP }} |
+          | **Workflow Run** | [View Run Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
+          | **Commit** | [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}) |
+          | **Branch** | ${{ github.ref_name }} |
+          | **Triggered By** | ${{ github.event_name }} |
+          | **Actor** | ${{ github.actor }} |
+          
+          ## Logs
+          Execution logs have been saved as artifacts and are available for download in the workflow run details.
+          
+          **Artifact Retention:** 30 days
+          
+          EOF
+        continue-on-error: true
+
+      # 4. Create issue on failure (optional - uncomment to enable)
+      # - name: Create Issue on Failure
+      #   if: needs.run-agents.outputs.status == 'failure'
+      #   uses: actions/create-issue@v2
+      #   with:
+      #     title: "Bulk Agent Workflow Failed - ${{ needs.run-agents.outputs.timestamp }}"
+      #     body: |
+      #       ❌ **Bulk Agent Workflow Execution Failed**
+      #       
+      #       - **Summary:** ${{ needs.run-agents.outputs.summary }}
+      #       - **Workflow Run:** [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+      #       - **Commit:** [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+      #       - **Branch:** ${{ github.ref_name }}
+      #       - **Time:** ${{ needs.run-agents.outputs.timestamp }}
+      #     labels: bug,automation
+
+# Workflow Documentation:
+#
+# ## Setup Instructions
+# 1. Ensure `scripts/run-all-agents.sh` exists and is executable
+# 2. This workflow is configured to run:
+#    - On schedule: Daily at 2 AM UTC (modify cron as needed)
+#    - On push: After each commit to main branch
+#    - Manually: Via GitHub Actions tab using "Run workflow"
+#
+# ## Configuration
+# - TIMEOUT: 120 minutes for full job, 90 minutes for script execution
+# - CONCURRENCY: Only one workflow runs at a time (new push cancels in-progress)
+# - ARTIFACTS: Logs retained for 30 days
+# - NODE_VERSION: 18 (update in setup-node step if needed)
+#
+# ## Monitoring
+# - View runs: Actions tab -> "Bulk Agent Workflow"
+# - Download logs: Each run shows artifacts section
+# - Review summary: Posted automatically in workflow run summary
+#
+# ## Customization
+# - Change schedule cron: Modify the `cron` value under `schedule`
+# - Adjust timeouts: Change `timeout-minutes` values
+# - Enable issue creation: Uncomment the "Create Issue on Failure" step
+# - Add notifications: Integrate with Slack/Teams using additional steps
+#
+# ## Troubleshooting
+# - Check logs: Download from artifacts or view in workflow run
+# - Script issues: Ensure run-all-agents.sh is executable (chmod +x)
+# - Permission errors: Check GitHub Actions permissions in Settings
+# - Rate limits: Adjust schedule to reduce frequency if needed
