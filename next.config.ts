@@ -1,19 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',
+  output: "export",
   trailingSlash: true,
-  basePath: process.env.NODE_ENV === 'production' ? '/fixer-digital-agent' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/fixer-digital-agent/' : '',
+  basePath: process.env.NODE_ENV === "production" ? "/fixer-digital-agent" : "",
+  assetPrefix: process.env.NODE_ENV === "production" ? "/fixer-digital-agent/" : "",
   images: {
-    unoptimized: true
-  },
-  distDir: 'out',
-  eslint: {
-    ignoreDuringBuilds: true,
+    unoptimized: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
   },
 };
 
