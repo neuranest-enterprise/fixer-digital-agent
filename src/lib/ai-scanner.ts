@@ -26,6 +26,16 @@ export interface Insight {
   roi: number;
 }
 
+export interface HeatmapData {
+  type: string;
+  data: Record<string, unknown>;
+}
+
+export interface ScreenshotData {
+  url: string;
+  timestamp: string;
+}
+
 export interface VisualAnalysis {
   heatmaps: HeatmapData[];
   screenshots: ScreenshotData[];

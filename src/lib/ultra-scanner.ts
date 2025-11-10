@@ -7,12 +7,9 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import OpenAI from 'openai';
 
 // Initialize all AI systems
-const geminiKeys = process.env.GEMINI_API_KEYS?.split(',') || [];
 const gemini = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY!);
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 export interface UltraScanResult {
   // Core Business Intelligence
@@ -210,7 +207,7 @@ export interface UltraReportData {
 }
 
 export class UltraPowerfulScanner {
-  private geminiModel: any;
+  private geminiModel: ReturnType<GoogleGenerativeAI['getGenerativeModel']>;
   private currentGeminiKeyIndex = 0;
   
   constructor() {
@@ -332,10 +329,10 @@ export class UltraPowerfulScanner {
       technicalAnalysis,
       contentAnalysis,
       conversionAnalysis
-    };
+    } as WebsiteIntelligence;
   }
 
-  private async performTechnicalDeepScan(url: string): Promise<any> {
+  private async performTechnicalDeepScan(_url: string): Promise<Record<string, unknown>> {
     // Simulated ultra-advanced technical analysis
     return {
       performanceScore: 78 + Math.floor(Math.random() * 15),
@@ -367,7 +364,7 @@ export class UltraPowerfulScanner {
     };
   }
 
-  private async performContentIntelligenceAnalysis(url: string): Promise<any> {
+  private async performContentIntelligenceAnalysis(url: string): Promise<Record<string, unknown>> {
     const prompt = `Analyze this website's content strategy and provide detailed insights: ${url}
     
     Focus on:
@@ -379,7 +376,7 @@ export class UltraPowerfulScanner {
 
     try {
       const result = await this.geminiModel.generateContent(prompt);
-      const response = await result.response;
+      await result.response;
       
       return {
         contentQualityScore: 82 + Math.floor(Math.random() * 15),
@@ -424,16 +421,17 @@ export class UltraPowerfulScanner {
       this.analyzePlatform('youtube', socialHandles.youtube)
     ]);
 
-    const overallSocialScore = this.calculateSocialScore(platforms);
+    const filteredPlatforms = platforms.filter((p): p is Record<string, unknown> => p !== null);
+    const overallSocialScore = this.calculateSocialScore(filteredPlatforms);
     
     return {
-      platforms: platforms.filter(p => p !== null),
+      platforms: filteredPlatforms,
       overallSocialScore,
-      engagement: await this.analyzeEngagementPatterns(platforms),
-      contentStrategy: await this.analyzeContentStrategy(platforms),
+      engagement: await this.analyzeEngagementPatterns(filteredPlatforms),
+      contentStrategy: await this.analyzeContentStrategy(filteredPlatforms),
       influencerOpportunities: await this.identifyInfluencerOpportunities(),
       socialCommerce: await this.analyzeSocialCommerceOpportunities()
-    };
+    } as unknown as SocialMediaIntelligence;
   }
 
   /**
@@ -511,11 +509,11 @@ export class UltraPowerfulScanner {
 
   // Additional helper methods with realistic implementations...
   private async generateStrategicRecommendations(
-    businessOverview: BusinessIntelligence,
-    websiteIntelligence: WebsiteIntelligence,
-    socialMediaIntelligence: SocialMediaIntelligence,
-    googleBusinessIntelligence: GoogleBusinessIntelligence,
-    competitorIntelligence: CompetitorIntelligence
+    _businessOverview: BusinessIntelligence,
+    _websiteIntelligence: WebsiteIntelligence,
+    _socialMediaIntelligence: SocialMediaIntelligence,
+    _googleBusinessIntelligence: GoogleBusinessIntelligence,
+    _competitorIntelligence: CompetitorIntelligence
   ): Promise<StrategicRecommendation[]> {
     
     const recommendations: StrategicRecommendation[] = [
@@ -579,7 +577,7 @@ export class UltraPowerfulScanner {
   }
 
   // More helper methods...
-  private getFallbackContentAnalysis(): any {
+  private getFallbackContentAnalysis(): Record<string, unknown> {
     return {
       contentQualityScore: 78,
       keywordOptimization: 72,
@@ -590,36 +588,36 @@ export class UltraPowerfulScanner {
   }
 
   // Placeholder implementations for complex methods
-  private async performConversionOptimizationAnalysis(url: string): Promise<any> { return {}; }
-  private async analyzePlatform(platform: string, handle?: string): Promise<any> { return null; }
-  private calculateSocialScore(platforms: any[]): number { return 78; }
-  private async analyzeEngagementPatterns(platforms: any[]): Promise<any> { return {}; }
-  private async analyzeContentStrategy(platforms: any[]): Promise<any> { return {}; }
-  private async identifyInfluencerOpportunities(): Promise<any[]> { return []; }
-  private async analyzeSocialCommerceOpportunities(): Promise<any> { return {}; }
-  private async scanMapsAndLocalPresence(businessName: string, location?: string): Promise<MapsIntelligence> {
+  private async performConversionOptimizationAnalysis(_url: string): Promise<Record<string, unknown>> { return {}; }
+  private async analyzePlatform(_platform: string, _handle?: string): Promise<Record<string, unknown> | null> { return null; }
+  private calculateSocialScore(_platforms: Record<string, unknown>[]): number { return 78; }
+  private async analyzeEngagementPatterns(_platforms: Record<string, unknown>[]): Promise<Record<string, unknown>> { return {}; }
+  private async analyzeContentStrategy(_platforms: Record<string, unknown>[]): Promise<Record<string, unknown>> { return {}; }
+  private async identifyInfluencerOpportunities(): Promise<Record<string, unknown>[]> { return []; }
+  private async analyzeSocialCommerceOpportunities(): Promise<Record<string, unknown>> { return {}; }
+  private async scanMapsAndLocalPresence(_businessName: string, _location?: string): Promise<MapsIntelligence> {
     return {} as MapsIntelligence;
   }
-  private async scanCompetitiveLandscape(businessName: string, websiteUrl: string): Promise<CompetitorIntelligence> {
+  private async scanCompetitiveLandscape(_businessName: string, _websiteUrl: string): Promise<CompetitorIntelligence> {
     return {} as CompetitorIntelligence;
   }
-  private async generateBusinessIntelligence(...args: any[]): Promise<BusinessIntelligence> {
+  private async generateBusinessIntelligence(..._args: unknown[]): Promise<BusinessIntelligence> {
     return {} as BusinessIntelligence;
   }
-  private async analyzeMarketPositioning(...args: any[]): Promise<MarketIntelligence> {
+  private async analyzeMarketPositioning(..._args: unknown[]): Promise<MarketIntelligence> {
     return {} as MarketIntelligence;
   }
-  private async analyzeDigitalFootprint(...args: any[]): Promise<DigitalFootprintAnalysis> {
+  private async analyzeDigitalFootprint(..._args: unknown[]): Promise<DigitalFootprintAnalysis> {
     return {} as DigitalFootprintAnalysis;
   }
-  private async identifyRevenueOpportunities(...args: any[]): Promise<RevenueOpportunity[]> { return []; }
-  private async createTransformationPlan(...args: any[]): Promise<TransformationPlan> {
+  private async identifyRevenueOpportunities(..._args: unknown[]): Promise<RevenueOpportunity[]> { return []; }
+  private async createTransformationPlan(..._args: unknown[]): Promise<TransformationPlan> {
     return {} as TransformationPlan;
   }
-  private async createDeployableAgent(...args: any[]): Promise<DeployableAgent> {
+  private async createDeployableAgent(..._args: unknown[]): Promise<DeployableAgent> {
     return {} as DeployableAgent;
   }
-  private async prepareUltraReportData(...args: any[]): Promise<UltraReportData> {
+  private async prepareUltraReportData(..._args: unknown[]): Promise<UltraReportData> {
     return {} as UltraReportData;
   }
 }
@@ -636,7 +634,7 @@ export interface SocialHandles {
 
 // Additional type definitions would continue here...
 export interface SocialPlatformAnalysis { platform: string; }
-export interface AudienceInsights { demographics: any; }
+export interface AudienceInsights { demographics: Record<string, unknown>; }
 export interface ContentTypeAnalysis { type: string; }
 export interface InfluencerOpportunity { influencer: string; }
 export interface SentimentAnalysis { positive: number; neutral: number; negative: number; }

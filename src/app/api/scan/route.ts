@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { multiAI } from '@/lib/ai-integrations';
 
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 export async function POST(request: NextRequest) {
   try {
     const { websiteUrl } = await request.json();

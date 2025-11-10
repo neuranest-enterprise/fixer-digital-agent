@@ -1,9 +1,11 @@
 import Stripe from 'stripe';
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-});
+// Initialize Stripe with your secret key (only if key is available)
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-07-30.basil',
+    })
+  : null;
 
 export interface PaymentIntent {
   id: string;
@@ -19,6 +21,9 @@ export class StripePaymentProcessor {
    */
   static async createPaymentIntent(amount: number, currency: string = 'usd'): Promise<PaymentIntent> {
     try {
+      if (!stripe) {
+        throw new Error('Stripe is not initialized. Please configure STRIPE_SECRET_KEY.');
+      }
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100, // Convert to cents
         currency: currency,
@@ -47,6 +52,9 @@ export class StripePaymentProcessor {
    */
   static async createCustomer(email: string, name: string) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe is not initialized. Please configure STRIPE_SECRET_KEY.');
+      }
       const customer = await stripe.customers.create({
         email: email,
         name: name,
@@ -68,6 +76,9 @@ export class StripePaymentProcessor {
    */
   static async createSubscription(customerId: string, priceId: string) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe is not initialized. Please configure STRIPE_SECRET_KEY.');
+      }
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
         items: [{ price: priceId }],
@@ -88,6 +99,9 @@ export class StripePaymentProcessor {
    */
   static async verifyPayment(paymentIntentId: string) {
     try {
+      if (!stripe) {
+        throw new Error('Stripe is not initialized. Please configure STRIPE_SECRET_KEY.');
+      }
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
       return {
         success: paymentIntent.status === 'succeeded',

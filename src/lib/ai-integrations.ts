@@ -41,7 +41,7 @@ export interface AIAnalysisResult {
 }
 
 export class MultiAIProcessor {
-  private geminiModel: any;
+  private geminiModel: ReturnType<GoogleGenerativeAI['getGenerativeModel']> | null;
   private currentGeminiKeyIndex = 0;
 
   constructor() {
@@ -81,7 +81,14 @@ export class MultiAIProcessor {
   /**
    * 💎 GEMINI AI ANALYSIS
    */
-  private async analyzeWithGemini(url: string, content: string): Promise<any> {
+  private async analyzeWithGemini(url: string, content: string): Promise<{
+    technicalScore: number;
+    performanceScore: number;
+    seoScore: number;
+    uxScore: number;
+    insights: string[];
+    recommendations: string[];
+  }> {
     try {
       if (!this.geminiModel) {
         return this.getFallbackAnalysis('Gemini (API key not available)');
@@ -129,7 +136,14 @@ export class MultiAIProcessor {
   /**
    * 🤖 OPENAI GPT ANALYSIS
    */
-  private async analyzeWithOpenAI(url: string, content: string): Promise<any> {
+  private async analyzeWithOpenAI(url: string, content: string): Promise<{
+    technicalScore: number;
+    performanceScore: number;
+    seoScore: number;
+    uxScore: number;
+    insights: string[];
+    recommendations: string[];
+  }> {
     try {
       if (!openai) {
         return this.getFallbackAnalysis('OpenAI (API key not available)');
@@ -189,6 +203,14 @@ export class MultiAIProcessor {
    */
   private async analyzeCompetitors(url: string): Promise<string[]> {
     try {
+      if (!this.geminiModel) {
+        return [
+          'Competitor analysis reveals market opportunities',
+          'Strategic positioning advantages identified',
+          'Revenue capture strategies available'
+        ];
+      }
+
       const prompt = `
         Analyze the competitive landscape for website: ${url}
         
@@ -220,7 +242,11 @@ export class MultiAIProcessor {
   /**
    * 💰 REVENUE PROJECTION MODELING
    */
-  private async projectRevenue(content: string): Promise<any> {
+  private async projectRevenue(content: string): Promise<{
+    current: number;
+    projected: number;
+    multiplier: number;
+  }> {
     try {
       if (!openai) {
         return {
@@ -286,10 +312,10 @@ export class MultiAIProcessor {
    * 🔬 SYNTHESIZE ALL AI RESULTS
    */
   private synthesizeAIResults(
-    gemini: any,
-    openai: any,
+    gemini: { technicalScore?: number; performanceScore?: number; seoScore?: number; uxScore?: number; insights?: string[]; recommendations?: string[] },
+    openai: { technicalScore?: number; performanceScore?: number; seoScore?: number; uxScore?: number; insights?: string[]; recommendations?: string[] },
     competitors: string[],
-    revenue: any
+    revenue: { current: number; projected: number; multiplier: number }
   ): AIAnalysisResult {
     // Average scores from multiple AI systems
     const technicalScore = Math.round(((gemini.technicalScore || 75) + (openai.technicalScore || 75)) / 2);
@@ -329,7 +355,14 @@ export class MultiAIProcessor {
   /**
    * 🔄 FALLBACK ANALYSIS
    */
-  private getFallbackAnalysis(source: string): any {
+  private getFallbackAnalysis(source: string): {
+    technicalScore: number;
+    performanceScore: number;
+    seoScore: number;
+    uxScore: number;
+    insights: string[];
+    recommendations: string[];
+  } {
     return {
       technicalScore: 75,
       performanceScore: 70,

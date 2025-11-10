@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { ScanResult } from '../../lib/ai-scanner';
-import { pdfGenerator, ReportData } from '../../lib/pdf-generator';
 import ReportGenerator from '../../components/ReportGenerator';
 
 /**
@@ -167,7 +166,7 @@ export default function ScanPage() {
     setIsScanning(false);
   };
 
-  const fetchWebsiteContent = async (url: string): Promise<string> => {
+  const fetchWebsiteContent = async (_url: string): Promise<string> => {
     try {
       // In a real implementation, you'd use a CORS proxy or server-side fetch
       // For demo purposes, return sample content
@@ -178,7 +177,16 @@ export default function ScanPage() {
     }
   };
 
-  const convertAIResultToScanResult = (aiResult: any, url: string): ScanResult => {
+  const convertAIResultToScanResult = (aiResult: {
+    technicalScore: number;
+    performanceScore: number;
+    seoScore: number;
+    uxScore: number;
+    insights: string[];
+    recommendations: string[];
+    competitorAnalysis: string[];
+    revenueProjections: { current: number; projected: number; multiplier: number };
+  }, _url: string): ScanResult => {
     const overallScore = Math.round((aiResult.technicalScore + aiResult.performanceScore + aiResult.seoScore + aiResult.uxScore) / 4);
     
     return {
@@ -254,7 +262,7 @@ export default function ScanPage() {
             🧠 Revolutionary AI Scanner
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 mb-8">
-            The world's most advanced website analysis system. 
+            The world&apos;s most advanced website analysis system. 
             <span className="font-bold text-yellow-300"> 1000+ AI algorithms</span> in 30 seconds.
           </p>
         </div>
