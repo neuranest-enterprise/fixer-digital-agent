@@ -251,20 +251,20 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <h3 className="text-xl font-bold text-white mb-3">How does the guarantee work?</h3>
-              <p className="text-gray-300">
-                Our Masterclass Audit comes with a full multifold ROI guarantee. If you don't see at least 
-                5x return on your investment within 6 months, we'll refund your money plus pay you $5,000 
-                for your time.
-              </p>
+                <p className="text-gray-300">
+                  Our Masterclass Audit comes with a full multifold ROI guarantee. If you don&apos;t see at least 
+                  5x return on your investment within 6 months, we&apos;ll refund your money plus pay you $5,000 
+                  for your time.
+                </p>
             </div>
             
             <div>
               <h3 className="text-xl font-bold text-white mb-3">What makes your AI different?</h3>
-              <p className="text-gray-300">
-                Our AI system uses 1000+ proprietary algorithms developed by PhD researchers from MIT, 
-                Stanford, and Cambridge. It's the only system that combines technical analysis, 
-                behavioral psychology, and revenue optimization.
-              </p>
+                <p className="text-gray-300">
+                  Our AI system uses 1000+ proprietary algorithms developed by PhD researchers from MIT, 
+                  Stanford, and Cambridge. It&apos;s the only system that combines technical analysis, 
+                  behavioral psychology, and revenue optimization.
+                </p>
             </div>
             
             <div>

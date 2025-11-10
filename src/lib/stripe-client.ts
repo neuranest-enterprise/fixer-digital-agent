@@ -1,9 +1,23 @@
 import Stripe from 'stripe';
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-});
+let stripe: Stripe | null = null;
+
+const getStripeClient = (): Stripe => {
+  if (stripe) {
+    return stripe;
+  }
+
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    throw new Error('Stripe secret key is not configured. Please set STRIPE_SECRET_KEY in your environment.');
+  }
+
+  stripe = new Stripe(apiKey, {
+    apiVersion: '2024-06-20' as Stripe.LatestApiVersion,
+  });
+
+  return stripe;
+};
 
 export interface PaymentIntent {
   id: string;
@@ -19,7 +33,7 @@ export class StripePaymentProcessor {
    */
   static async createPaymentIntent(amount: number, currency: string = 'usd'): Promise<PaymentIntent> {
     try {
-      const paymentIntent = await stripe.paymentIntents.create({
+      const paymentIntent = await getStripeClient().paymentIntents.create({
         amount: amount * 100, // Convert to cents
         currency: currency,
         metadata: {
@@ -47,7 +61,7 @@ export class StripePaymentProcessor {
    */
   static async createCustomer(email: string, name: string) {
     try {
-      const customer = await stripe.customers.create({
+      const customer = await getStripeClient().customers.create({
         email: email,
         name: name,
         metadata: {
@@ -68,7 +82,7 @@ export class StripePaymentProcessor {
    */
   static async createSubscription(customerId: string, priceId: string) {
     try {
-      const subscription = await stripe.subscriptions.create({
+      const subscription = await getStripeClient().subscriptions.create({
         customer: customerId,
         items: [{ price: priceId }],
         payment_behavior: 'default_incomplete',
@@ -88,7 +102,7 @@ export class StripePaymentProcessor {
    */
   static async verifyPayment(paymentIntentId: string) {
     try {
-      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      const paymentIntent = await getStripeClient().paymentIntents.retrieve(paymentIntentId);
       return {
         success: paymentIntent.status === 'succeeded',
         status: paymentIntent.status,
@@ -102,4 +116,4 @@ export class StripePaymentProcessor {
   }
 }
 
-export default stripe;
+export { getStripeClient };

@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { ScanResult } from '../../lib/ai-scanner';
-import { pdfGenerator, ReportData } from '../../lib/pdf-generator';
 import ReportGenerator from '../../components/ReportGenerator';
+import type { AIAnalysisResult } from '../../lib/ai-integrations';
 
 /**
  * 🔬 REVOLUTIONARY WEBSITE SCANNER
@@ -19,12 +19,11 @@ export default function ScanPage() {
 
   const performScan = async () => {
     if (!url) return;
-    
+
     setIsScanning(true);
     setScanProgress(0);
     setCurrentTask('Initializing Revolutionary AI Scanner...');
 
-    // Simulate advanced scanning process
     const tasks = [
       'Deploying 1000+ AI algorithms...',
       'Analyzing technical architecture...',
@@ -39,17 +38,16 @@ export default function ScanPage() {
       'Generating AI-powered insights...',
       'Synthesizing revolutionary recommendations...',
       'Calculating revenue projections...',
-      'Finalizing masterclass report...'
+      'Finalizing masterclass report...',
     ];
 
     for (let i = 0; i < tasks.length; i++) {
       setCurrentTask(tasks[i]);
       setScanProgress(((i + 1) / tasks.length) * 100);
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
     }
 
     try {
-      // Use server-side API for AI analysis
       const response = await fetch('/api/scan', {
         method: 'POST',
         headers: {
@@ -60,14 +58,13 @@ export default function ScanPage() {
 
       if (response.ok) {
         const data = await response.json();
-        const result = convertAIResultToScanResult(data.analysis, url);
+        const result = convertAIResultToScanResult(data.analysis);
         setScanResult(result);
       } else {
         throw new Error('Scan API failed');
       }
     } catch (error) {
       console.error('Scan error:', error);
-      // Provide demo result for showcase
       setScanResult({
         score: 78,
         insights: [
@@ -79,7 +76,7 @@ export default function ScanPage() {
             impact: 'Could increase organic traffic by 400-600%',
             solution: 'Implement comprehensive SEO optimization strategy',
             effort: 'medium',
-            roi: 500
+            roi: 500,
           },
           {
             category: 'Performance',
@@ -89,7 +86,7 @@ export default function ScanPage() {
             impact: 'Each second of delay reduces conversions by 7%',
             solution: 'Optimize images, minify code, implement CDN',
             effort: 'high',
-            roi: 300
+            roi: 300,
           },
           {
             category: 'Conversion',
@@ -99,8 +96,8 @@ export default function ScanPage() {
             impact: 'Could double conversion rates',
             solution: 'A/B test CTA variations and implement best performers',
             effort: 'low',
-            roi: 800
-          }
+            roi: 800,
+          },
         ],
         recommendations: [],
         visualData: {
@@ -109,61 +106,63 @@ export default function ScanPage() {
           designScore: 82,
           accessibilityScore: 89,
           brandConsistency: 75,
-          visualHierarchy: 88
+          visualHierarchy: 88,
         },
         performanceMetrics: {
           loadTime: 3.2,
           coreWebVitals: {
             lcp: 2.8,
             fid: 120,
-            cls: 0.15
+            cls: 0.15,
           },
           lighthouseScore: 72,
           mobileScore: 68,
-          securityScore: 91
+          securityScore: 91,
         },
-        conversionOpportunities: [{
-          currentRate: 1.8,
-          projectedRate: 8.5,
-          opportunities: [
-            'Optimize headline for emotional impact',
-            'Add urgency elements to CTA buttons',
-            'Implement exit-intent popup',
-            'Add social proof testimonials',
-            'Streamline checkout process'
-          ],
-          abtestSuggestions: [
-            'Test different headline variations',
-            'Test button colors (orange vs blue)',
-            'Test page layouts (single vs multi-column)',
-            'Test pricing presentation formats'
-          ],
-          revenueImpact: 420000
-        }],
+        conversionOpportunities: [
+          {
+            currentRate: 1.8,
+            projectedRate: 8.5,
+            opportunities: [
+              'Optimize headline for emotional impact',
+              'Add urgency elements to CTA buttons',
+              'Implement exit-intent popup',
+              'Add social proof testimonials',
+              'Streamline checkout process',
+            ],
+            abtestSuggestions: [
+              'Test different headline variations',
+              'Test button colors (orange vs blue)',
+              'Test page layouts (single vs multi-column)',
+              'Test pricing presentation formats',
+            ],
+            revenueImpact: 420000,
+          },
+        ],
         competitorAnalysis: {
           topCompetitors: ['competitor1.com', 'competitor2.com', 'competitor3.com'],
           strengthsWeaknesses: [
             'Competitors have stronger social media presence',
             'Your mobile experience outperforms 70% of competitors',
-            'Pricing strategy needs adjustment to match market leaders'
+            'Pricing strategy needs adjustment to match market leaders',
           ],
           marketPosition: 'Strong potential for market leadership with proper optimization',
           opportunities: [
             'Target competitor keyword gaps worth $50K+ monthly',
             'Improve user experience beyond competition standards',
-            'Leverage unique value propositions more effectively'
-          ]
+            'Leverage unique value propositions more effectively',
+          ],
         },
         revenueProjections: {
           currentRevenue: 85000,
           projectedRevenue: 425000,
           multipleIncrease: 5.0,
           timeframe: '3-6 months',
-          confidenceLevel: 94
-        }
+          confidenceLevel: 94,
+        },
       });
     }
-    
+
     setIsScanning(false);
   };
 
@@ -178,20 +177,29 @@ export default function ScanPage() {
     }
   };
 
-  const convertAIResultToScanResult = (aiResult: any, url: string): ScanResult => {
-    const overallScore = Math.round((aiResult.technicalScore + aiResult.performanceScore + aiResult.seoScore + aiResult.uxScore) / 4);
-    
+  const convertAIResultToScanResult = (aiResult: AIAnalysisResult): ScanResult => {
+    const sanitizedScores = [
+      aiResult.technicalScore,
+      aiResult.performanceScore,
+      aiResult.seoScore,
+      aiResult.uxScore,
+    ].map((score) => (Number.isFinite(score) ? score : 0));
+    const overallScore = Math.round(
+      sanitizedScores.reduce((total, score) => total + score, 0) / sanitizedScores.length
+    );
+
     return {
       score: overallScore,
       insights: aiResult.insights.map((insight, index) => ({
-        category: index % 4 === 0 ? 'Technical' : index % 4 === 1 ? 'SEO' : index % 4 === 2 ? 'Performance' : 'UX',
+        category:
+          index % 4 === 0 ? 'Technical' : index % 4 === 1 ? 'SEO' : index % 4 === 2 ? 'Performance' : 'UX',
         severity: index < 3 ? 'critical' : index < 7 ? 'high' : 'medium',
         title: `AI Insight ${index + 1}`,
         description: insight,
         impact: 'Significant impact on business performance',
         solution: aiResult.recommendations[index] || 'Implement AI-recommended optimizations',
         effort: index % 3 === 0 ? 'high' : index % 3 === 1 ? 'medium' : 'low',
-        roi: Math.floor(Math.random() * 500) + 200
+        roi: Math.floor(Math.random() * 500) + 200,
       })),
       recommendations: [],
       visualData: {
@@ -200,44 +208,47 @@ export default function ScanPage() {
         designScore: aiResult.uxScore,
         accessibilityScore: Math.min(aiResult.uxScore + 10, 100),
         brandConsistency: Math.min(aiResult.uxScore + 5, 100),
-        visualHierarchy: aiResult.uxScore
+        visualHierarchy: aiResult.uxScore,
       },
       performanceMetrics: {
         loadTime: 3.2 - (aiResult.performanceScore / 100) * 2,
         coreWebVitals: {
           lcp: 4.0 - (aiResult.performanceScore / 100) * 2,
           fid: 200 - (aiResult.performanceScore / 100) * 100,
-          cls: 0.3 - (aiResult.performanceScore / 100) * 0.2
+          cls: 0.3 - (aiResult.performanceScore / 100) * 0.2,
         },
         lighthouseScore: aiResult.performanceScore,
         mobileScore: Math.min(aiResult.performanceScore + 5, 100),
-        securityScore: Math.min(aiResult.technicalScore + 15, 100)
+        securityScore: Math.min(aiResult.technicalScore + 15, 100),
       },
-      conversionOpportunities: [{
-        currentRate: 2.1,
-        projectedRate: 2.1 * (aiResult.revenueProjections.multiplier / 2),
-        opportunities: aiResult.recommendations.slice(0, 5),
-        abtestSuggestions: [
-          'Test AI-recommended headline variations',
-          'Optimize CTA button placement',
-          'Implement personalization features',
-          'Test mobile-first design improvements'
-        ],
-        revenueImpact: aiResult.revenueProjections.projected - aiResult.revenueProjections.current
-      }],
+      conversionOpportunities: [
+        {
+          currentRate: 2.1,
+          projectedRate: 2.1 * (aiResult.revenueProjections.multiplier / 2),
+          opportunities: aiResult.recommendations.slice(0, 5),
+          abtestSuggestions: [
+            'Test AI-recommended headline variations',
+            'Optimize CTA button placement',
+            'Implement personalization features',
+            'Test mobile-first design improvements',
+          ],
+          revenueImpact:
+            aiResult.revenueProjections.projected - aiResult.revenueProjections.current,
+        },
+      ],
       competitorAnalysis: {
         topCompetitors: ['competitor1.com', 'competitor2.com', 'competitor3.com'],
         strengthsWeaknesses: aiResult.competitorAnalysis.slice(0, 3),
         marketPosition: 'Strong potential for market leadership with AI optimizations',
-        opportunities: aiResult.competitorAnalysis.slice(3, 6)
+        opportunities: aiResult.competitorAnalysis.slice(3, 6),
       },
       revenueProjections: {
         currentRevenue: aiResult.revenueProjections.current,
         projectedRevenue: aiResult.revenueProjections.projected,
         multipleIncrease: aiResult.revenueProjections.multiplier,
         timeframe: '3-6 months',
-        confidenceLevel: 94
-      }
+        confidenceLevel: 94,
+      },
     };
   };
 
@@ -249,15 +260,15 @@ export default function ScanPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-            🧠 Revolutionary AI Scanner
-          </h1>
-          <p className="text-xl md:text-2xl text-blue-100 mb-8">
-            The world's most advanced website analysis system. 
-            <span className="font-bold text-yellow-300"> 1000+ AI algorithms</span> in 30 seconds.
-          </p>
-        </div>
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+              🧠 Revolutionary AI Scanner
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-100 mb-8">
+              The world&apos;s most advanced website analysis system. 
+              <span className="font-bold text-yellow-300"> 1000+ AI algorithms</span> in 30 seconds.
+            </p>
+          </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-16">

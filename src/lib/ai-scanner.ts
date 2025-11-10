@@ -26,6 +26,25 @@ export interface Insight {
   roi: number;
 }
 
+export interface HeatmapData {
+  page: string;
+  hotspots: Array<{
+    x: number;
+    y: number;
+    intensity: number;
+  }>;
+  summary: string;
+}
+
+export interface ScreenshotData {
+  url: string;
+  description: string;
+  metrics?: {
+    lcp?: number;
+    conversionLift?: number;
+  };
+}
+
 export interface VisualAnalysis {
   heatmaps: HeatmapData[];
   screenshots: ScreenshotData[];

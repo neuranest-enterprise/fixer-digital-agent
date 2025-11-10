@@ -125,6 +125,13 @@ export class UltraReportGenerator {
   }
 
   /**
+   * 🧠 BUSINESS INTELLIGENCE OVERVIEW (Pages 6-10)
+   */
+  private addBusinessIntelligenceSection(_scanResult: UltraScanResult): void {
+    /* Implementation */
+  }
+
+  /**
    * 🎨 FUTURISTIC COVER PAGE
    */
   private addFuturisticCoverPage(scanResult: UltraScanResult): void {
@@ -407,7 +414,7 @@ export class UltraReportGenerator {
       this.pdf.setTextColor(100, 200, 255);
       this.pdf.setFontSize(16);
       this.pdf.setFont('helvetica', 'bold');
-      this.pdf.text(stat.value, xPos + 17.5, this.currentY + 12, { align: 'center' });
+      this.pdf.text(String(stat.value), xPos + 17.5, this.currentY + 12, { align: 'center' });
       
       this.pdf.setTextColor(255, 255, 255);
       this.pdf.setFontSize(8);
