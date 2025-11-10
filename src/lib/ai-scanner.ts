@@ -26,6 +26,17 @@ export interface Insight {
   roi: number;
 }
 
+export interface HeatmapData {
+  type: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
+}
+
+export interface ScreenshotData {
+  url: string;
+  timestamp: Date;
+}
+
 export interface VisualAnalysis {
   heatmaps: HeatmapData[];
   screenshots: ScreenshotData[];

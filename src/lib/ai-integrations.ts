@@ -41,6 +41,7 @@ export interface AIAnalysisResult {
 }
 
 export class MultiAIProcessor {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private geminiModel: any;
   private currentGeminiKeyIndex = 0;
 
@@ -81,6 +82,7 @@ export class MultiAIProcessor {
   /**
    * 💎 GEMINI AI ANALYSIS
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async analyzeWithGemini(url: string, content: string): Promise<any> {
     try {
       if (!this.geminiModel) {
@@ -129,6 +131,7 @@ export class MultiAIProcessor {
   /**
    * 🤖 OPENAI GPT ANALYSIS
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async analyzeWithOpenAI(url: string, content: string): Promise<any> {
     try {
       if (!openai) {
@@ -220,6 +223,7 @@ export class MultiAIProcessor {
   /**
    * 💰 REVENUE PROJECTION MODELING
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async projectRevenue(content: string): Promise<any> {
     try {
       if (!openai) {
@@ -286,9 +290,12 @@ export class MultiAIProcessor {
    * 🔬 SYNTHESIZE ALL AI RESULTS
    */
   private synthesizeAIResults(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     gemini: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     openai: any,
     competitors: string[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     revenue: any
   ): AIAnalysisResult {
     // Average scores from multiple AI systems
@@ -329,6 +336,7 @@ export class MultiAIProcessor {
   /**
    * 🔄 FALLBACK ANALYSIS
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getFallbackAnalysis(source: string): any {
     return {
       technicalScore: 75,

@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ScanResult, aiScanner } from '../lib/ai-scanner';
+import { ScanResult } from '../lib/ai-scanner';
 import { pdfGenerator, ReportData } from '../lib/pdf-generator';
-import { StripePaymentProcessor } from '../lib/stripe-client';
 
 /**
  * 💎 WORLD-CLASS REPORT GENERATOR

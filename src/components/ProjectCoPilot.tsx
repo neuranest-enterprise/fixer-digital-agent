@@ -61,6 +61,7 @@ What would you like to work on today?`,
       }
     ]);
     setIsInitialized(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [inputValue, setInputValue] = useState('');

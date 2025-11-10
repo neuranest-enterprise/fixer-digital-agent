@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [, setSelectedPlan] = useState<string | null>(null);
 
   const plans = [
     {
@@ -172,7 +172,7 @@ export default function PricingPage() {
 
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-16">
-          {plans.map((plan, index) => (
+          {plans.map((plan) => (
             <div
               key={plan.id}
               className={`relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 border border-slate-700 shadow-2xl transition-all hover:scale-105 ${
@@ -252,8 +252,8 @@ export default function PricingPage() {
             <div>
               <h3 className="text-xl font-bold text-white mb-3">How does the guarantee work?</h3>
               <p className="text-gray-300">
-                Our Masterclass Audit comes with a full multifold ROI guarantee. If you don't see at least 
-                5x return on your investment within 6 months, we'll refund your money plus pay you $5,000 
+                Our Masterclass Audit comes with a full multifold ROI guarantee. If you don&apos;t see at least 
+                5x return on your investment within 6 months, we&apos;ll refund your money plus pay you $5,000 
                 for your time.
               </p>
             </div>
@@ -262,7 +262,7 @@ export default function PricingPage() {
               <h3 className="text-xl font-bold text-white mb-3">What makes your AI different?</h3>
               <p className="text-gray-300">
                 Our AI system uses 1000+ proprietary algorithms developed by PhD researchers from MIT, 
-                Stanford, and Cambridge. It's the only system that combines technical analysis, 
+                Stanford, and Cambridge. It&apos;s the only system that combines technical analysis, 
                 behavioral psychology, and revenue optimization.
               </p>
             </div>

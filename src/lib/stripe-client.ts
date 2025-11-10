@@ -1,9 +1,11 @@
 import Stripe from 'stripe';
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20',
-});
+// Initialize Stripe with your secret key (only if available)
+const stripe = process.env.STRIPE_SECRET_KEY 
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-07-30.basil',
+    })
+  : null;
 
 export interface PaymentIntent {
   id: string;
@@ -18,6 +20,9 @@ export class StripePaymentProcessor {
    * Create payment intent for Masterclass Audit
    */
   static async createPaymentIntent(amount: number, currency: string = 'usd'): Promise<PaymentIntent> {
+    if (!stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
     try {
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100, // Convert to cents
@@ -46,6 +51,9 @@ export class StripePaymentProcessor {
    * Create customer for subscription
    */
   static async createCustomer(email: string, name: string) {
+    if (!stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
     try {
       const customer = await stripe.customers.create({
         email: email,
@@ -67,6 +75,9 @@ export class StripePaymentProcessor {
    * Create subscription for recurring plans
    */
   static async createSubscription(customerId: string, priceId: string) {
+    if (!stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
     try {
       const subscription = await stripe.subscriptions.create({
         customer: customerId,
@@ -87,6 +98,9 @@ export class StripePaymentProcessor {
    * Verify payment completion
    */
   static async verifyPayment(paymentIntentId: string) {
+    if (!stripe) {
+      throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.');
+    }
     try {
       const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
       return {
