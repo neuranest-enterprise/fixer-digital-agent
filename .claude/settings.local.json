@@ -1,0 +1,31 @@
+{
+  "permissionMode": "default",
+  "allowedTools": [
+    "Read",
+    "Edit",
+    "Bash(ls)",
+    "Bash(tree)",
+    "Bash(pwd)",
+    "Bash(cat)",
+    "Bash(git:*)"
+  ],
+  "disallowedTools": [
+    "Bash(rm)",
+    "Bash(sudo)",
+    "Bash(dd)",
+    "Bash(shred)",
+    "Bash(mkfs:*)"
+  ],
+  "hooks": [
+    {
+      "on": "afterToolUse",
+      "match": { "tool": "Edit" },
+      "command": "bash .claude/hooks/log_tool_usage.sh edit"
+    },
+    {
+      "on": "afterToolUse",
+      "match": { "tool": "Bash" },
+      "command": "bash .claude/hooks/log_tool_usage.sh bash"
+    }
+  ]
+}

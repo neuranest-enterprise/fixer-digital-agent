@@ -1,0 +1,15 @@
+{
+  "notes": "Example hooks configuration. Wire this via settings when ready.",
+  "examples": [
+    {
+      "on": "afterToolUse",
+      "match": { "tool": "Edit" },
+      "command": "bash .claude/hooks/log_tool_usage.sh edit"
+    },
+    {
+      "on": "afterToolUse",
+      "match": { "tool": "Bash" },
+      "command": "bash .claude/hooks/log_tool_usage.sh bash"
+    }
+  ]
+}
